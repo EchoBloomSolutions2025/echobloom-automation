@@ -1,0 +1,205 @@
+{
+  "tableName": "Content Queue",
+  "description": "Master content generation queue for AI video automation",
+  "fields": [
+    {
+      "name": "Content ID",
+      "type": "autoNumber",
+      "description": "Unique identifier for each content request"
+    },
+    {
+      "name": "Certification",
+      "type": "singleSelect",
+      "options": [
+        "CIPP/US",
+        "CIPM",
+        "CIPT",
+        "CIPP/E",
+        "CIPP/A",
+        "PMP",
+        "CISSP",
+        "CompTIA Security+",
+        "AWS Solutions Architect",
+        "Google Cloud Professional"
+      ],
+      "description": "Target certification for the content"
+    },
+    {
+      "name": "Content Type",
+      "type": "singleSelect",
+      "options": [
+        "Study Guide",
+        "Practice Questions",
+        "Concept Explanation",
+        "Exam Tips",
+        "Real-World Scenarios"
+      ],
+      "description": "Type of educational content to generate"
+    },
+    {
+      "name": "Topic",
+      "type": "singleLineText",
+      "description": "Specific topic or concept to cover"
+    },
+    {
+      "name": "Duration",
+      "type": "number",
+      "options": {
+        "precision": 0
+      },
+      "description": "Video duration in seconds (default: 10)"
+    },
+    {
+      "name": "Priority",
+      "type": "singleSelect",
+      "options": [
+        "High",
+        "Medium",
+        "Low"
+      ],
+      "description": "Generation priority"
+    },
+    {
+      "name": "Status",
+      "type": "singleSelect",
+      "options": [
+        "Queued",
+        "Processing",
+        "Generating",
+        "Uploading",
+        "Completed",
+        "Failed"
+      ],
+      "description": "Current status of content generation"
+    },
+    {
+      "name": "Video URL",
+      "type": "url",
+      "description": "Google Drive link to generated video"
+    },
+    {
+      "name": "Created Date",
+      "type": "dateTime",
+      "description": "When the request was created"
+    },
+    {
+      "name": "Completed Date",
+      "type": "dateTime",
+      "description": "When the video was generated and uploaded"
+    },
+    {
+      "name": "Error Message",
+      "type": "multilineText",
+      "description": "Error details if generation failed"
+    },
+    {
+      "name": "Video Prompt",
+      "type": "multilineText",
+      "description": "Generated prompt sent to AI video API"
+    },
+    {
+      "name": "Target Platform",
+      "type": "multipleSelects",
+      "options": [
+        "TikTok",
+        "YouTube Shorts",
+        "Instagram Reels",
+        "Gumroad",
+        "Course Platform"
+      ],
+      "description": "Where this content will be published"
+    },
+    {
+      "name": "Tags",
+      "type": "multipleSelects",
+      "options": [
+        "Privacy",
+        "Security",
+        "Compliance",
+        "Data Protection",
+        "GDPR",
+        "CCPA",
+        "Project Management",
+        "Cloud Computing",
+        "Networking"
+      ],
+      "description": "Content tags for organization"
+    }
+  ],
+  "views": [
+    {
+      "name": "All Content",
+      "type": "grid"
+    },
+    {
+      "name": "Queued",
+      "type": "grid",
+      "filters": [
+        {
+          "field": "Status",
+          "operator": "is",
+          "value": "Queued"
+        }
+      ],
+      "sort": [
+        {
+          "field": "Priority",
+          "direction": "desc"
+        },
+        {
+          "field": "Created Date",
+          "direction": "asc"
+        }
+      ]
+    },
+    {
+      "name": "Processing",
+      "type": "grid",
+      "filters": [
+        {
+          "field": "Status",
+          "operator": "isAnyOf",
+          "value": ["Processing", "Generating", "Uploading"]
+        }
+      ]
+    },
+    {
+      "name": "Completed",
+      "type": "grid",
+      "filters": [
+        {
+          "field": "Status",
+          "operator": "is",
+          "value": "Completed"
+        }
+      ],
+      "sort": [
+        {
+          "field": "Completed Date",
+          "direction": "desc"
+        }
+      ]
+    },
+    {
+      "name": "Failed",
+      "type": "grid",
+      "filters": [
+        {
+          "field": "Status",
+          "operator": "is",
+          "value": "Failed"
+        }
+      ]
+    },
+    {
+      "name": "By Certification",
+      "type": "kanban",
+      "groupBy": "Certification"
+    },
+    {
+      "name": "By Status",
+      "type": "kanban",
+      "groupBy": "Status"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+name: Deploy n8n Workflows to Cloud
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'n8n-workflows/**'
+  workflow_dispatch:
+
+env:
+  N8N_API_URL: ${{ secrets.N8N_API_URL }}
+  N8N_API_KEY: ${{ secrets.N8N_API_KEY }}
+
+jobs:
+  deploy-workflows:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install n8n CLI
+        run: npm install -g n8n
+        
+      - name: Deploy AI Video Generation Workflow
+        run: |
+          curl -X POST "$N8N_API_URL/workflows" \
+            -H "X-N8N-API-KEY: $N8N_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d @n8n-workflows/ai-video-generation-workflow.json
+            
+      - name: Activate Workflow
+        run: |
+          WORKFLOW_ID=$(curl -s "$N8N_API_URL/workflows" \
+            -H "X-N8N-API-KEY: $N8N_API_KEY" | \
+            jq -r '.data[] | select(.name=="AI Video Generation - Certification Content Pipeline") | .id')
+          
+          curl -X PATCH "$N8N_API_URL/workflows/$WORKFLOW_ID" \
+            -H "X-N8N-API-KEY: $N8N_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{"active": true}'
+            
+      - name: Deployment Summary
+        run: |
+          echo "## n8n Workflow Deployment Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed Workflows:**" >> $GITHUB_STEP_SUMMARY
+          echo "- AI Video Generation - Certification Content Pipeline" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** Active and ready to process content" >> $GITHUB_STEP_SUMMARY
